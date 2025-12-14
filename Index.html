@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shabbat Times · Washington (Chabad)</title>
+
+  <!-- PWA bits can be added later -->
+  <!-- <link rel="manifest" href="manifest.json"> -->
+  <!-- <meta name="theme-color" content="#000000"> -->
+
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: #0b0b0b;
+      color: #f2f2f2;
+      line-height: 1.35;
+    }
+    header {
+      padding: 18px 16px 10px;
+      border-bottom: 1px solid #242424;
+      background: #0f0f0f;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+    .sub {
+      margin: 0;
+      opacity: 0.85;
+      font-size: 13px;
+    }
+    main { padding: 16px; max-width: 720px; margin: 0 auto; }
+    .card {
+      border: 1px solid #242424;
+      border-radius: 12px;
+      padding: 14px;
+      background: #101010;
+      margin: 14px 0;
+    }
+    .warn {
+      border-left: 4px solid #ffd54a;
+      background: #14120a;
+    }
+    label { display: block; font-size: 12px; opacity: 0.85; margin-bottom: 6px; }
+    select, button, a.btn {
+      width: 100%;
+      background: #171717;
+      color: #f2f2f2;
+      border: 1px solid #2b2b2b;
+      border-radius: 10px;
+      padding: 12px 12px;
+      font-size: 15px;
+    }
+    select:focus, button:focus, a.btn:focus { outline: 2px solid #3a7afe; outline-offset: 2px; }
+    .row { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .muted { opacity: 0.75; font-size: 13px; }
+    .small { opacity: 0.7; font-size: 12px; }
+    .widgetWrap {
+      border: 1px solid #2b2b2b;
+      border-radius: 12px;
+      padding: 12px;
+      background: #0c0c0c;
+      overflow: hidden;
+    }
+    /* The Chabad widget brings its own table styling; keep it readable on dark */
+    .widgetWrap table { filter: invert(1) hue-rotate(180deg); } /* makes their light widget readable on dark */
+    .links { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+    a.btn {
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    footer {
+      padding: 18px 16px;
+      border-top: 1px solid #242424;
+      color: #bdbdbd;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Washington Shabbat &amp; Yom Tov Times</h1>
+    <p class="sub">Powered by Chabad.org candle-lighting times (WA locations only).</p>
+  </header>
+
+  <main>
+    <section class="card warn" aria-live="polite">
+      <strong>Halakhic note:</strong>
+      <div class="muted" style="margin-top:6px;">
+        This tool is intended for <b>before</b> Shabbat/Yom Tov (preparation) and <b>after</b> Shabbat/Yom Tov.
+        Please do not use on Shabbat or Yom Tov.
+      </div>
+    </section>
+
+    <section class="card">
+      <label for="waLocation">Select a Washington location</label>
+      <div class="row">
+        <select id="waLocation">
+          <!-- locationType: 2 = US Zip Code; locationType: 1 = city -->
+          <option value="98201|2">Everett, WA (98201)</option>
+          <option value="98113|2">Seattle, WA (98113)</option>
+          <option value="98007|2">Bellevue, WA (98007)</option>
+          <option value="98037|2">Lynnwood, WA (98037)</option>
+          <option value="98501|2">Olympia, WA (98501)</option>
+          <option value="98402|2">Tacoma, WA (98402)</option>
+          <option value="99207|2">Spokane, WA (99207)</option>
+        </select>
+
+        <button id="applyBtn" type="button">Load times</button>
+      </div>
+
+      <p class="small" style="margin:10px 0 0;">
+        Tip: keep this WA-only list tight so your shliach doesn’t have to “manage” it.
+      </p>
+    </section>
+
+    <section class="card">
+      <strong>This week’s times (Chabad.org)</strong>
+      <p class="muted" style="margin:8px 0 12px;">
+        The widget below includes Shabbat + upcoming Yom Tov candle-lighting times for the selected WA location.
+      </p>
+
+      <div class="widgetWrap" id="widgetWrap">
+        <div id="widgetMount" class="muted">Loading…</div>
+      </div>
+
+      <div class="links">
+        <a id="openChabadPage" class="btn" href="#" rel="noreferrer noopener" target="_blank">
+          Open full Chabad.org page (details + calendar options)
+        </a>
+      </div>
+
+      <p class="small" style="margin-top:10px;">
+        Source: Chabad.org syndicated candle-lighting widget.  [oai_citation:2‡Chabad](https://www.chabad.org/tools/shared/candlelighting/default_cdo/aid/264483/jewish/Candle-Lighting-Times-on-Your-Website.htm)
+      </p>
+    </section>
+
+    <section class="card">
+      <strong>Erev Shabbat prep (quick list)</strong>
+      <ul class="muted" style="margin:10px 0 0; padding-left: 18px;">
+        <li>Tzedakah before candle lighting</li>
+        <li>Challah, wine/grape juice, candles ready</li>
+        <li>Hot plate/blech &amp; lights/timers set</li>
+        <li>Phones put away before Shabbat</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    Built for GitHub Pages. No accounts, no tracking. Times displayed via Chabad.org widget.
+  </footer>
+
+  <script>
+    // --- Chabad.org widget loader (WA locations) ---
+    // The syndicated widget supports locationId + locationType in the script URL.  [oai_citation:3‡Chabad](https://www.chabad.org/calendar/candlelighting_cdo/locationId/98037/locationType/2/jewish/Candle-Lighting.htm?utm_source=chatgpt.com)
+    const STORAGE_KEY = "wa_chabad_location";
+    const selectEl = document.getElementById("waLocation");
+    const applyBtn = document.getElementById("applyBtn");
+    const mountEl = document.getElementById("widgetMount");
+    const openChabadPageEl = document.getElementById("openChabadPage");
+
+    function getSelection() {
+      const [locationId, locationType] = (selectEl.value || "98201|2").split("|");
+      return { locationId, locationType };
+    }
+
+    function setFromStorage() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const opt = [...selectEl.options].find(o => o.value === saved);
+        if (opt) selectEl.value = saved;
+      }
+    }
+
+    function saveToStorage() {
+      localStorage.setItem(STORAGE_KEY, selectEl.value);
+    }
+
+    function clearMount() {
+      mountEl.innerHTML = "";
+      // Remove any old widget script nodes
+      const old = document.querySelectorAll("script[data-chabad-widget='1']");
+      old.forEach(n => n.remove());
+    }
+
+    function buildChabadWidget({ locationId, locationType }) {
+      clearMount();
+
+      // 1) Mount container
+      const container = document.createElement("div");
+      container.id = "chabadWidgetContainer";
+      mountEl.appendChild(container);
+
+      // 2) Create the script tag that Chabad provides (weeks + ln = layout option)
+      // weeks=4 shows up to 4 weeks (Shabbat + holidays as provided by Chabad widget).
+      const s = document.createElement("script");
+      s.setAttribute("data-chabad-widget", "1");
+      s.type = "text/javascript";
+      s.src = `https://www.chabad.org/tools/shared/candlelighting/candlelighting.js.asp?locationId=${encodeURIComponent(locationId)}&locationType=${encodeURIComponent(locationType)}&ln=2&weeks=4`;
+      s.onload = () => {};
+      s.onerror = () => {
+        mountEl.innerHTML = "<div class='muted'>Couldn’t load times (network blocked or script failed). Try again.</div>";
+      };
+
+      // Insert script into container
+      container.appendChild(s);
+
+      // Update “open full page” link for the same location
+      openChabadPageEl.href =
+        `https://www.chabad.org/calendar/candlelighting_cdo/locationId/${encodeURIComponent(locationId)}/locationType/${encodeURIComponent(locationType)}/jewish/Candle-Lighting.htm`;
+    }
+
+    function load() {
+      const sel = getSelection();
+      buildChabadWidget(sel);
+    }
+
+    // Init
+    setFromStorage();
+    load();
+
+    applyBtn.addEventListener("click", () => {
+      saveToStorage();
+      load();
+    });
+
+    // Optional: auto-load when user changes dropdown
+    selectEl.addEventListener("change", () => {
+      saveToStorage();
+      load();
+    });
+  </script>
+</body>
+</html>

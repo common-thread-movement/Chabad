@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Shabbat Times · Washington (Chabad)</title>
+  <title>Install the App · Shabbat WA</title>
 
   <!-- PWA essentials -->
   <link rel="manifest" href="manifest.json">
@@ -12,281 +12,131 @@
 
   <style>
     :root { color-scheme: dark; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: #0b0b0b;
-      color: #f2f2f2;
-      line-height: 1.35;
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:#0b0b0b;
+      color:#f2f2f2;
+      line-height:1.35;
     }
-    header {
-      padding: 18px 16px 10px;
-      border-bottom: 1px solid #242424;
-      background: #0f0f0f;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    header{
+      padding:18px 16px 10px;
+      border-bottom:1px solid #242424;
+      background:#0f0f0f;
+      position:sticky;
+      top:0;
+      z-index:10;
     }
-    h1 { margin: 0 0 8px; font-size: 18px; letter-spacing: 0.2px; }
-    .sub { margin: 0; opacity: 0.85; font-size: 13px; }
-
-    main { padding: 16px; max-width: 720px; margin: 0 auto; }
-
-    .card {
-      border: 1px solid #242424;
-      border-radius: 12px;
-      padding: 14px;
-      background: #101010;
-      margin: 14px 0;
+    h1{ margin:0 0 8px; font-size:18px; }
+    .sub{ margin:0; opacity:.85; font-size:13px; }
+    main{ padding:16px; max-width:720px; margin:0 auto; }
+    .card{
+      border:1px solid #242424;
+      border-radius:12px;
+      padding:14px;
+      background:#101010;
+      margin:14px 0;
     }
-    .warn { border-left: 4px solid #ffd54a; background: #14120a; }
-    .muted { opacity: 0.78; font-size: 13px; }
-    .small { opacity: 0.7; font-size: 12px; }
+    .muted{ opacity:.78; font-size:13px; }
+    .small{ opacity:.7; font-size:12px; }
+    .warn{ border-left:4px solid #ffd54a; background:#14120a; }
+    .grid{ display:grid; grid-template-columns:1fr; gap:10px; }
 
-    label { display: block; font-size: 12px; opacity: 0.85; margin-bottom: 6px; }
-    select, button, a.btn {
-      width: 100%;
-      background: #171717;
-      color: #f2f2f2;
-      border: 1px solid #2b2b2b;
-      border-radius: 10px;
-      padding: 12px 12px;
-      font-size: 15px;
+    a.btn, button{
+      width:100%;
+      background:#171717;
+      color:#f2f2f2;
+      border:1px solid #2b2b2b;
+      border-radius:10px;
+      padding:12px 12px;
+      font-size:15px;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-block;
+      text-align:center;
     }
-    select:focus, button:focus, a.btn:focus { outline: 2px solid #3a7afe; outline-offset: 2px; }
-
-    .row { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .links { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
-
-    .widgetWrap {
-      border: 1px solid #2b2b2b;
-      border-radius: 12px;
-      padding: 12px;
-      background: #0c0c0c;
-      overflow: hidden;
+    .pill{
+      display:inline-block;
+      border:1px solid #2b2b2b;
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      opacity:.85;
+      background:#0c0c0c;
     }
-
-    /* Make the widget readable on dark backgrounds */
-    .widgetWrap table { filter: invert(1) hue-rotate(180deg); }
-
-    .statusline {
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .pill {
-      border: 1px solid #2b2b2b;
-      border-radius: 999px;
-      padding: 8px 10px;
-      font-size: 12px;
-      opacity: 0.85;
-      background: #0c0c0c;
-    }
-
-    a.btn {
-      text-decoration: none;
-      display: inline-block;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    footer {
-      padding: 18px 16px;
-      border-top: 1px solid #242424;
-      color: #bdbdbd;
-      font-size: 12px;
-    }
-
-    /* Minimal offline banner */
-    .offlineBanner {
-      display: none;
-      margin-top: 10px;
-      border: 1px solid #3a2e0c;
-      background: #14120a;
-      border-radius: 12px;
-      padding: 10px;
-      font-size: 12px;
-      opacity: 0.95;
+    .statusline{
+      margin-top:10px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
     }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Washington Shabbat &amp; Yom Tov Times</h1>
-    <p class="sub">Chabad.org candle-lighting times · WA locations only</p>
+    <h1>Install “Shabbat WA”</h1>
+    <p class="sub">A lightweight PWA (web app) for Washington Shabbat prep &amp; tools.</p>
   </header>
 
   <main>
-    <section class="card warn" aria-live="polite">
+    <section class="card warn">
       <strong>Halakhic note:</strong>
       <div class="muted" style="margin-top:6px;">
-        This tool is intended for <b>before</b> Shabbat/Yom Tov (preparation) and <b>after</b> Shabbat/Yom Tov.
+        This app is intended for <b>before</b> Shabbat/Yom Tov (preparation) and <b>after</b>.
         Please do not use on Shabbat or Yom Tov.
       </div>
     </section>
 
     <section class="card">
-      <label for="waLocation">Select a Washington location</label>
-      <div class="row">
-        <!-- locationType: 2 = US Zip Code -->
-        <select id="waLocation">
-          <option value="98201|2">Everett, WA (98201)</option>
-          <option value="98113|2">Seattle, WA (98113)</option>
-          <option value="98007|2">Bellevue, WA (98007)</option>
-          <option value="98037|2">Lynnwood, WA (98037)</option>
-          <option value="98501|2">Olympia, WA (98501)</option>
-          <option value="98402|2">Tacoma, WA (98402)</option>
-          <option value="99207|2">Spokane, WA (99207)</option>
-        </select>
+      <strong>Install on iPhone (Safari)</strong>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px;">
+        <li>Open this page in <b>Safari</b>.</li>
+        <li>Tap the <b>Share</b> icon.</li>
+        <li>Tap <b>Add to Home Screen</b>.</li>
+        <li>Open the app from your Home Screen.</li>
+      </ol>
+    </section>
 
-        <button id="applyBtn" type="button">Load times</button>
+    <section class="card">
+      <strong>Install on Android (Chrome)</strong>
+      <ol class="muted" style="margin:10px 0 0; padding-left:18px;">
+        <li>Open this page in <b>Chrome</b>.</li>
+        <li>Tap the <b>⋮</b> menu.</li>
+        <li>Tap <b>Install app</b> (or <b>Add to Home screen</b>).</li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <strong>Open the app</strong>
+      <div class="grid" style="margin-top:10px;">
+        <a class="btn" href="./app.html">Open App Home</a>
+        <button id="installBtn" type="button" style="display:none;">Install now</button>
       </div>
 
       <div class="statusline">
         <div class="pill" id="netPill">Checking connection…</div>
-        <div class="pill" id="swPill">Service Worker: not checked</div>
-      </div>
-
-      <div class="offlineBanner" id="offlineBanner">
-        You’re offline. Times require internet. Use <b>Prep (offline)</b> if you need checklists.
-      </div>
-
-      <p class="small" style="margin:10px 0 0;">
-        Tip: keep this WA list tight so your shliach doesn’t have to maintain it.
-      </p>
-    </section>
-
-    <section class="card">
-      <strong>This week’s times (Chabad.org)</strong>
-      <p class="muted" style="margin:8px 0 12px;">
-        Displays Shabbat + upcoming Yom Tov candle-lighting times for the selected WA location.
-      </p>
-
-      <div class="widgetWrap">
-        <div id="widgetMount" class="muted">Loading…</div>
-      </div>
-
-      <div class="links">
-        <a class="btn" href="./prep.html">Open Erev Shabbat prep (offline)</a>
-
-        <a id="openChabadPage" class="btn" href="#" rel="noreferrer noopener" target="_blank">
-          Open full Chabad.org page (details + calendar options)
-        </a>
+        <div class="pill" id="swPill">Service Worker: checking…</div>
       </div>
 
       <p class="small" style="margin-top:10px;">
-        If the times don’t load, your network may be blocking third-party scripts.
+        If “Install now” doesn’t appear, your browser may not support the prompt (iOS uses Add to Home Screen).
       </p>
-    </section>
-
-    <section class="card">
-      <strong>Erev Shabbat prep (quick list)</strong>
-      <ul class="muted" style="margin:10px 0 0; padding-left: 18px;">
-        <li>Tzedakah before candle lighting</li>
-        <li>Challah, wine/grape juice, candles ready</li>
-        <li>Hot plate/blech &amp; lights/timers set</li>
-        <li>Phones put away before Shabbat</li>
-      </ul>
     </section>
   </main>
 
-  <footer>
-    Built for GitHub Pages. No accounts, no tracking. Times are displayed via a Chabad.org widget.
-  </footer>
-
   <script>
-    // -------------------------
-    // Location selection + widget loader
-    // -------------------------
-    const STORAGE_KEY = "wa_chabad_location";
-    const selectEl = document.getElementById("waLocation");
-    const applyBtn = document.getElementById("applyBtn");
-    const mountEl = document.getElementById("widgetMount");
-    const openChabadPageEl = document.getElementById("openChabadPage");
-
-    function setFromStorage() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const opt = [...selectEl.options].find(o => o.value === saved);
-        if (opt) selectEl.value = saved;
-      }
-    }
-    function saveToStorage() {
-      localStorage.setItem(STORAGE_KEY, selectEl.value);
-    }
-    function getSelection() {
-      const [locationId, locationType] = (selectEl.value || "98201|2").split("|");
-      return { locationId, locationType };
-    }
-
-    function clearMount() {
-      mountEl.innerHTML = "";
-      // remove any prior widget script
-      document.querySelectorAll("script[data-chabad-widget='1']").forEach(n => n.remove());
-    }
-
-    function buildChabadWidget({ locationId, locationType }) {
-      clearMount();
-
-      // container for script injection
-      const container = document.createElement("div");
-      container.id = "chabadWidgetContainer";
-      mountEl.appendChild(container);
-
-      // Chabad syndicated candle-lighting widget
-      const s = document.createElement("script");
-      s.setAttribute("data-chabad-widget", "1");
-      s.type = "text/javascript";
-      s.src = `https://www.chabad.org/tools/shared/candlelighting/candlelighting.js.asp?locationId=${encodeURIComponent(locationId)}&locationType=${encodeURIComponent(locationType)}&ln=2&weeks=4`;
-      s.onerror = () => {
-        mountEl.innerHTML = "<div class='muted'>Couldn’t load times (script blocked or offline). Use Prep (offline) if needed.</div>";
-      };
-      container.appendChild(s);
-
-      // “open full page” link for same location
-      openChabadPageEl.href =
-        `https://www.chabad.org/calendar/candlelighting_cdo/locationId/${encodeURIComponent(locationId)}/locationType/${encodeURIComponent(locationType)}/jewish/Candle-Lighting.htm`;
-    }
-
-    function loadTimes() {
-      const sel = getSelection();
-      buildChabadWidget(sel);
-    }
-
-    // init
-    setFromStorage();
-    loadTimes();
-
-    applyBtn.addEventListener("click", () => {
-      saveToStorage();
-      loadTimes();
-    });
-    selectEl.addEventListener("change", () => {
-      saveToStorage();
-      loadTimes();
-    });
-
-    // -------------------------
-    // Offline indicator (best-effort)
-    // -------------------------
+    // Online indicator
     const netPill = document.getElementById("netPill");
-    const offlineBanner = document.getElementById("offlineBanner");
-
-    function updateNetUI() {
-      const online = navigator.onLine;
-      netPill.textContent = online ? "Online" : "Offline";
-      offlineBanner.style.display = online ? "none" : "block";
+    function updateNetUI(){
+      netPill.textContent = navigator.onLine ? "Online" : "Offline";
     }
     window.addEventListener("online", updateNetUI);
     window.addEventListener("offline", updateNetUI);
     updateNetUI();
 
-    // -------------------------
-    // Service Worker registration (PWA)
-    // -------------------------
+    // Service worker registration
     const swPill = document.getElementById("swPill");
     (async () => {
       if (!("serviceWorker" in navigator)) {
@@ -294,12 +144,30 @@
         return;
       }
       try {
-        const reg = await navigator.serviceWorker.register("./sw.js");
+        await navigator.serviceWorker.register("./sw.js");
         swPill.textContent = "Service Worker: active";
-      } catch (e) {
+      } catch {
         swPill.textContent = "Service Worker: failed";
       }
     })();
+
+    // Optional install prompt (mainly Android/Chrome)
+    let deferredPrompt = null;
+    const installBtn = document.getElementById("installBtn");
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = "inline-block";
+    });
+
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch {}
+      deferredPrompt = null;
+      installBtn.style.display = "none";
+    });
   </script>
 </body>
 </html>

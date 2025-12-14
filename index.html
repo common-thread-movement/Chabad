@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Shabbat Times · Washington (Chabad)</title>
 
-  <!-- PWA bits can be added later -->
-  <!-- <link rel="manifest" href="manifest.json"> -->
-  <!-- <meta name="theme-color" content="#000000"> -->
+  <!-- PWA essentials -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0b0b">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
 
   <style>
     :root { color-scheme: dark; }
@@ -26,17 +27,11 @@
       top: 0;
       z-index: 10;
     }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 18px;
-      letter-spacing: 0.2px;
-    }
-    .sub {
-      margin: 0;
-      opacity: 0.85;
-      font-size: 13px;
-    }
+    h1 { margin: 0 0 8px; font-size: 18px; letter-spacing: 0.2px; }
+    .sub { margin: 0; opacity: 0.85; font-size: 13px; }
+
     main { padding: 16px; max-width: 720px; margin: 0 auto; }
+
     .card {
       border: 1px solid #242424;
       border-radius: 12px;
@@ -44,10 +39,10 @@
       background: #101010;
       margin: 14px 0;
     }
-    .warn {
-      border-left: 4px solid #ffd54a;
-      background: #14120a;
-    }
+    .warn { border-left: 4px solid #ffd54a; background: #14120a; }
+    .muted { opacity: 0.78; font-size: 13px; }
+    .small { opacity: 0.7; font-size: 12px; }
+
     label { display: block; font-size: 12px; opacity: 0.85; margin-bottom: 6px; }
     select, button, a.btn {
       width: 100%;
@@ -59,9 +54,10 @@
       font-size: 15px;
     }
     select:focus, button:focus, a.btn:focus { outline: 2px solid #3a7afe; outline-offset: 2px; }
+
     .row { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .muted { opacity: 0.75; font-size: 13px; }
-    .small { opacity: 0.7; font-size: 12px; }
+    .links { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+
     .widgetWrap {
       border: 1px solid #2b2b2b;
       border-radius: 12px;
@@ -69,19 +65,50 @@
       background: #0c0c0c;
       overflow: hidden;
     }
-    /* The Chabad widget brings its own table styling; keep it readable on dark */
-    .widgetWrap table { filter: invert(1) hue-rotate(180deg); } /* makes their light widget readable on dark */
-    .links { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+
+    /* Make the widget readable on dark backgrounds */
+    .widgetWrap table { filter: invert(1) hue-rotate(180deg); }
+
+    .statusline {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      border: 1px solid #2b2b2b;
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 12px;
+      opacity: 0.85;
+      background: #0c0c0c;
+    }
+
     a.btn {
       text-decoration: none;
       display: inline-block;
       text-align: center;
+      cursor: pointer;
     }
+
     footer {
       padding: 18px 16px;
       border-top: 1px solid #242424;
       color: #bdbdbd;
       font-size: 12px;
+    }
+
+    /* Minimal offline banner */
+    .offlineBanner {
+      display: none;
+      margin-top: 10px;
+      border: 1px solid #3a2e0c;
+      background: #14120a;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 12px;
+      opacity: 0.95;
     }
   </style>
 </head>
@@ -89,7 +116,7 @@
 <body>
   <header>
     <h1>Washington Shabbat &amp; Yom Tov Times</h1>
-    <p class="sub">Powered by Chabad.org candle-lighting times (WA locations only).</p>
+    <p class="sub">Chabad.org candle-lighting times · WA locations only</p>
   </header>
 
   <main>
@@ -104,8 +131,8 @@
     <section class="card">
       <label for="waLocation">Select a Washington location</label>
       <div class="row">
+        <!-- locationType: 2 = US Zip Code -->
         <select id="waLocation">
-          <!-- locationType: 2 = US Zip Code; locationType: 1 = city -->
           <option value="98201|2">Everett, WA (98201)</option>
           <option value="98113|2">Seattle, WA (98113)</option>
           <option value="98007|2">Bellevue, WA (98007)</option>
@@ -118,29 +145,40 @@
         <button id="applyBtn" type="button">Load times</button>
       </div>
 
+      <div class="statusline">
+        <div class="pill" id="netPill">Checking connection…</div>
+        <div class="pill" id="swPill">Service Worker: not checked</div>
+      </div>
+
+      <div class="offlineBanner" id="offlineBanner">
+        You’re offline. Times require internet. Use <b>Prep (offline)</b> if you need checklists.
+      </div>
+
       <p class="small" style="margin:10px 0 0;">
-        Tip: keep this WA-only list tight so your shliach doesn’t have to “manage” it.
+        Tip: keep this WA list tight so your shliach doesn’t have to maintain it.
       </p>
     </section>
 
     <section class="card">
       <strong>This week’s times (Chabad.org)</strong>
       <p class="muted" style="margin:8px 0 12px;">
-        The widget below includes Shabbat + upcoming Yom Tov candle-lighting times for the selected WA location.
+        Displays Shabbat + upcoming Yom Tov candle-lighting times for the selected WA location.
       </p>
 
-      <div class="widgetWrap" id="widgetWrap">
+      <div class="widgetWrap">
         <div id="widgetMount" class="muted">Loading…</div>
       </div>
 
       <div class="links">
+        <a class="btn" href="./prep.html">Open Erev Shabbat prep (offline)</a>
+
         <a id="openChabadPage" class="btn" href="#" rel="noreferrer noopener" target="_blank">
           Open full Chabad.org page (details + calendar options)
         </a>
       </div>
 
       <p class="small" style="margin-top:10px;">
-        Source: Chabad.org syndicated candle-lighting widget.  [oai_citation:2‡Chabad](https://www.chabad.org/tools/shared/candlelighting/default_cdo/aid/264483/jewish/Candle-Lighting-Times-on-Your-Website.htm)
+        If the times don’t load, your network may be blocking third-party scripts.
       </p>
     </section>
 
@@ -156,22 +194,18 @@
   </main>
 
   <footer>
-    Built for GitHub Pages. No accounts, no tracking. Times displayed via Chabad.org widget.
+    Built for GitHub Pages. No accounts, no tracking. Times are displayed via a Chabad.org widget.
   </footer>
 
   <script>
-    // --- Chabad.org widget loader (WA locations) ---
-    // The syndicated widget supports locationId + locationType in the script URL.  [oai_citation:3‡Chabad](https://www.chabad.org/calendar/candlelighting_cdo/locationId/98037/locationType/2/jewish/Candle-Lighting.htm?utm_source=chatgpt.com)
+    // -------------------------
+    // Location selection + widget loader
+    // -------------------------
     const STORAGE_KEY = "wa_chabad_location";
     const selectEl = document.getElementById("waLocation");
     const applyBtn = document.getElementById("applyBtn");
     const mountEl = document.getElementById("widgetMount");
     const openChabadPageEl = document.getElementById("openChabadPage");
-
-    function getSelection() {
-      const [locationId, locationType] = (selectEl.value || "98201|2").split("|");
-      return { locationId, locationType };
-    }
 
     function setFromStorage() {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -180,64 +214,92 @@
         if (opt) selectEl.value = saved;
       }
     }
-
     function saveToStorage() {
       localStorage.setItem(STORAGE_KEY, selectEl.value);
+    }
+    function getSelection() {
+      const [locationId, locationType] = (selectEl.value || "98201|2").split("|");
+      return { locationId, locationType };
     }
 
     function clearMount() {
       mountEl.innerHTML = "";
-      // Remove any old widget script nodes
-      const old = document.querySelectorAll("script[data-chabad-widget='1']");
-      old.forEach(n => n.remove());
+      // remove any prior widget script
+      document.querySelectorAll("script[data-chabad-widget='1']").forEach(n => n.remove());
     }
 
     function buildChabadWidget({ locationId, locationType }) {
       clearMount();
 
-      // 1) Mount container
+      // container for script injection
       const container = document.createElement("div");
       container.id = "chabadWidgetContainer";
       mountEl.appendChild(container);
 
-      // 2) Create the script tag that Chabad provides (weeks + ln = layout option)
-      // weeks=4 shows up to 4 weeks (Shabbat + holidays as provided by Chabad widget).
+      // Chabad syndicated candle-lighting widget
       const s = document.createElement("script");
       s.setAttribute("data-chabad-widget", "1");
       s.type = "text/javascript";
       s.src = `https://www.chabad.org/tools/shared/candlelighting/candlelighting.js.asp?locationId=${encodeURIComponent(locationId)}&locationType=${encodeURIComponent(locationType)}&ln=2&weeks=4`;
-      s.onload = () => {};
       s.onerror = () => {
-        mountEl.innerHTML = "<div class='muted'>Couldn’t load times (network blocked or script failed). Try again.</div>";
+        mountEl.innerHTML = "<div class='muted'>Couldn’t load times (script blocked or offline). Use Prep (offline) if needed.</div>";
       };
-
-      // Insert script into container
       container.appendChild(s);
 
-      // Update “open full page” link for the same location
+      // “open full page” link for same location
       openChabadPageEl.href =
         `https://www.chabad.org/calendar/candlelighting_cdo/locationId/${encodeURIComponent(locationId)}/locationType/${encodeURIComponent(locationType)}/jewish/Candle-Lighting.htm`;
     }
 
-    function load() {
+    function loadTimes() {
       const sel = getSelection();
       buildChabadWidget(sel);
     }
 
-    // Init
+    // init
     setFromStorage();
-    load();
+    loadTimes();
 
     applyBtn.addEventListener("click", () => {
       saveToStorage();
-      load();
+      loadTimes();
     });
-
-    // Optional: auto-load when user changes dropdown
     selectEl.addEventListener("change", () => {
       saveToStorage();
-      load();
+      loadTimes();
     });
+
+    // -------------------------
+    // Offline indicator (best-effort)
+    // -------------------------
+    const netPill = document.getElementById("netPill");
+    const offlineBanner = document.getElementById("offlineBanner");
+
+    function updateNetUI() {
+      const online = navigator.onLine;
+      netPill.textContent = online ? "Online" : "Offline";
+      offlineBanner.style.display = online ? "none" : "block";
+    }
+    window.addEventListener("online", updateNetUI);
+    window.addEventListener("offline", updateNetUI);
+    updateNetUI();
+
+    // -------------------------
+    // Service Worker registration (PWA)
+    // -------------------------
+    const swPill = document.getElementById("swPill");
+    (async () => {
+      if (!("serviceWorker" in navigator)) {
+        swPill.textContent = "Service Worker: unsupported";
+        return;
+      }
+      try {
+        const reg = await navigator.serviceWorker.register("./sw.js");
+        swPill.textContent = "Service Worker: active";
+      } catch (e) {
+        swPill.textContent = "Service Worker: failed";
+      }
+    })();
   </script>
 </body>
 </html>

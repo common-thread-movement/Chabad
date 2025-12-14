@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shabbat WA · App</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0b0b">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <style>
+    :root { color-scheme: dark; }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:#0b0b0b;
+      color:#f2f2f2;
+      line-height:1.35;
+    }
+    header{
+      padding:18px 16px 10px;
+      border-bottom:1px solid #242424;
+      background:#0f0f0f;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    h1{ margin:0 0 8px; font-size:18px; }
+    .sub{ margin:0; opacity:.85; font-size:13px; }
+    main{ padding:16px; max-width:720px; margin:0 auto; }
+    .card{
+      border:1px solid #242424;
+      border-radius:12px;
+      padding:14px;
+      background:#101010;
+      margin:14px 0;
+    }
+    .warn{ border-left:4px solid #ffd54a; background:#14120a; }
+    .muted{ opacity:.78; font-size:13px; }
+    label{ display:block; font-size:12px; opacity:.85; margin-bottom:6px; }
+
+    select, button, a.btn{
+      width:100%;
+      background:#171717;
+      color:#f2f2f2;
+      border:1px solid #2b2b2b;
+      border-radius:10px;
+      padding:12px 12px;
+      font-size:15px;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-block;
+      text-align:center;
+    }
+    .grid{ display:grid; grid-template-columns:1fr; gap:10px; }
+    .widgetWrap{
+      border:1px solid #2b2b2b;
+      border-radius:12px;
+      padding:12px;
+      background:#0c0c0c;
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .widgetWrap table{ filter: invert(1) hue-rotate(180deg); }
+    .small{ opacity:.7; font-size:12px; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Shabbat WA · App</h1>
+    <p class="sub">Tools: Times · Prep (offline) · Learning (weekday)</p>
+  </header>
+
+  <main>
+    <section class="card warn">
+      <strong>Halakhic note:</strong>
+      <div class="muted" style="margin-top:6px;">
+        Intended for <b>before</b> Shabbat/Yom Tov and <b>after</b>. Please do not use on Shabbat or Yom Tov.
+      </div>
+    </section>
+
+    <section class="card">
+      <strong>Tools</strong>
+      <div class="grid" style="margin-top:10px;">
+        <a class="btn" href="./prep.html">Erev Shabbat Prep (offline)</a>
+        <a class="btn" href="./learn.html">Daily Learning (weekday tool)</a>
+        <a class="btn" href="./index.html">Install / Download instructions</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <strong>Shabbat &amp; Yom Tov Times (Chabad.org)</strong>
+      <div style="margin-top:10px;">
+        <label for="waLocation">Washington location</label>
+        <select id="waLocation">
+          <option value="98201|2">Everett, WA (98201)</option>
+          <option value="98113|2">Seattle, WA (98113)</option>
+          <option value="98007|2">Bellevue, WA (98007)</option>
+          <option value="98037|2">Lynnwood, WA (98037)</option>
+          <option value="98501|2">Olympia, WA (98501)</option>
+          <option value="98402|2">Tacoma, WA (98402)</option>
+          <option value="99207|2">Spokane, WA (99207)</option>
+        </select>
+
+        <div class="grid" style="margin-top:10px;">
+          <button id="applyBtn" type="button">Load times</button>
+          <a id="openChabadPage" class="btn" href="#" target="_blank" rel="noreferrer noopener">Open full Chabad.org page</a>
+        </div>
+
+        <div class="widgetWrap">
+          <div id="widgetMount" class="muted">Loading…</div>
+        </div>
+
+        <p class="small" style="margin-top:10px;">
+          Offline note: times require internet; Prep/Learning pages work offline.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Save location so it persists across pages
+    const STORAGE_KEY = "wa_chabad_location_v1";
+
+    const selectEl = document.getElementById("waLocation");
+    const applyBtn = document.getElementById("applyBtn");
+    const mountEl = document.getElementById("widgetMount");
+    const openChabadPageEl = document.getElementById("openChabadPage");
+
+    function setFromStorage() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const opt = [...selectEl.options].find(o => o.value === saved);
+        if (opt) selectEl.value = saved;
+      }
+    }
+    function saveToStorage() {
+      localStorage.setItem(STORAGE_KEY, selectEl.value);
+    }
+    function getSelection() {
+      const [locationId, locationType] = (selectEl.value || "98201|2").split("|");
+      return { locationId, locationType };
+    }
+    function clearWidget() {
+      mountEl.innerHTML = "";
+      document.querySelectorAll("script[data-chabad-widget='1']").forEach(n => n.remove());
+    }
+    function loadWidget({ locationId, locationType }) {
+      clearWidget();
+      const container = document.createElement("div");
+      container.id = "chabadWidgetContainer";
+      mountEl.appendChild(container);
+
+      const script = document.createElement("script");
+      script.setAttribute("data-chabad-widget", "1");
+      script.type = "text/javascript";
+      script.src =
+        `https://www.chabad.org/tools/shared/candlelighting/candlelighting.js.asp?locationId=${encodeURIComponent(locationId)}&locationType=${encodeURIComponent(locationType)}&ln=2&weeks=4`;
+
+      script.onerror = () => {
+        mountEl.innerHTML =
+          "<div class='muted'>Couldn’t load times (offline or script blocked). Use Prep/Learning tools instead.</div>";
+      };
+
+      container.appendChild(script);
+
+      openChabadPageEl.href =
+        `https://www.chabad.org/calendar/candlelighting_cdo/locationId/${encodeURIComponent(locationId)}/locationType/${encodeURIComponent(locationType)}/jewish/Candle-Lighting.htm`;
+    }
+
+    function refreshTimes() {
+      loadWidget(getSelection());
+    }
+
+    setFromStorage();
+    refreshTimes();
+
+    applyBtn.addEventListener("click", () => {
+      saveToStorage();
+      refreshTimes();
+    });
+
+    selectEl.addEventListener("change", () => {
+      saveToStorage();
+      refreshTimes();
+    });
+
+    // SW register
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js");
+    }
+  </script>
+</body>
+</html>

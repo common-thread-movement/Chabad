@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daily Learning · (Weekday Tool)</title>
+
+  <meta name="theme-color" content="#0b0b0b">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: #0b0b0b;
+      color: #f2f2f2;
+      line-height: 1.35;
+    }
+    header {
+      padding: 18px 16px 10px;
+      border-bottom: 1px solid #242424;
+      background: #0f0f0f;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    h1 { margin: 0 0 6px; font-size: 18px; }
+    .sub { margin: 0; opacity: 0.85; font-size: 13px; }
+
+    main { padding: 16px; max-width: 720px; margin: 0 auto; }
+
+    .card {
+      border: 1px solid #242424;
+      border-radius: 12px;
+      padding: 14px;
+      background: #101010;
+      margin: 14px 0;
+    }
+    .warn { border-left: 4px solid #ffd54a; background: #14120a; }
+    .muted { opacity: 0.78; font-size: 13px; }
+    .small { opacity: 0.7; font-size: 12px; }
+
+    label { display: block; font-size: 12px; opacity: 0.85; margin-bottom: 6px; }
+    select, button, a.btn {
+      width: 100%;
+      background: #171717;
+      color: #f2f2f2;
+      border: 1px solid #2b2b2b;
+      border-radius: 10px;
+      padding: 12px 12px;
+      font-size: 15px;
+    }
+    button { cursor: pointer; }
+    a.btn { text-decoration: none; display: inline-block; text-align: center; }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .pill {
+      display: inline-block;
+      border: 1px solid #2b2b2b;
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 12px;
+      opacity: 0.85;
+      background: #0c0c0c;
+    }
+
+    .weeklist { margin-top: 10px; border-top: 1px solid #242424; }
+    .dayrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #242424;
+    }
+    .dayrow b { font-size: 14px; }
+    .chk {
+      width: 24px;
+      height: 24px;
+      accent-color: #3a7afe;
+    }
+
+    /* Print */
+    @media print {
+      header, .no-print { display: none !important; }
+      body { background: #fff; color: #000; }
+      .card { border: 1px solid #999; background: #fff; }
+      .muted, .small { opacity: 1; color: #111; }
+      .pill { border: 1px solid #999; background: #fff; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Daily Learning</h1>
+    <p class="sub">Weekday tracker + printable pack (not for Shabbat/Yom Tov use)</p>
+  </header>
+
+  <main>
+    <section class="card warn">
+      <strong>Halakhic note:</strong>
+      <div class="muted" style="margin-top:6px;">
+        Intended for <b>weekday use</b> and for <b>printing before Shabbat/Yom Tov</b>.
+        Please do not use on Shabbat or Yom Tov.
+      </div>
+    </section>
+
+    <section class="card">
+      <strong>Choose a learning track</strong>
+      <div class="grid" style="margin-top:10px;">
+        <div>
+          <label for="track">Track</label>
+          <select id="track">
+            <option value="chitas">Chitas (Chumash · Tehillim · Tanya)</option>
+            <option value="tanya">Tanya (daily)</option>
+            <option value="rambam1">Rambam (1 chapter)</option>
+            <option value="rambam3">Rambam (3 chapters)</option>
+            <option value="seferhamitzvot">Sefer HaMitzvot (daily)</option>
+          </select>
+        </div>
+
+        <div class="grid">
+          <a class="btn" id="openSource" href="#" target="_blank" rel="noreferrer noopener">Open online source</a>
+          <button class="no-print" type="button" id="printBtn">Print weekly pack</button>
+          <a class="btn no-print" href="./index.html">Back to times</a>
+        </div>
+
+        <div class="pill" id="weekLabel">Week of: —</div>
+        <p class="small">
+          This page does not reproduce sefarim text. It tracks the habit and prints a checklist pack.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <strong>This week (Mon–Fri)</strong>
+      <p class="muted" style="margin:8px 0 0;">
+        Mark “done” on weekdays. Print before Shabbat if you want a paper checklist.
+      </p>
+
+      <div class="weeklist" id="weekList"></div>
+
+      <div class="grid no-print" style="margin-top:10px;">
+        <button type="button" id="resetBtn">Reset this week</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const KEY_TRACK = "learn_track_v1";
+    const KEY_STATE = "learn_state_v1"; // stores per-week completion keyed by ISO week start date
+
+    const trackEl = document.getElementById("track");
+    const openSourceEl = document.getElementById("openSource");
+    const weekLabelEl = document.getElementById("weekLabel");
+    const weekListEl = document.getElementById("weekList");
+    const resetBtn = document.getElementById("resetBtn");
+    const printBtn = document.getElementById("printBtn");
+
+    function getMonday(d) {
+      const date = new Date(d);
+      const day = date.getDay(); // 0 Sun .. 6 Sat
+      const diff = (day === 0 ? -6 : 1) - day; // move to Monday
+      date.setDate(date.getDate() + diff);
+      date.setHours(0,0,0,0);
+      return date;
+    }
+
+    function fmtDate(d) {
+      return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    }
+
+    function isoDate(d) {
+      const z = new Date(d);
+      z.setHours(0,0,0,0);
+      return z.toISOString().slice(0,10);
+    }
+
+    function loadState() {
+      try { return JSON.parse(localStorage.getItem(KEY_STATE) || "{}"); }
+      catch { return {}; }
+    }
+    function saveState(state) {
+      localStorage.setItem(KEY_STATE, JSON.stringify(state));
+    }
+
+    function trackSourceUrl(track) {
+      // Keep it simple and Chabad-aligned:
+      // (They can replace links later with their exact preferred source pages.)
+      switch (track) {
+        case "chitas": return "https://www.chabad.org/dailystudy/default_cdo/jewish/Daily-Study.htm";
+        case "tanya": return "https://www.chabad.org/dailystudy/tanya.asp";
+        case "rambam1":
+        case "rambam3": return "https://www.chabad.org/dailystudy/rambam.asp";
+        case "seferhamitzvot": return "https://www.chabad.org/dailystudy/seferHamitzvos.asp";
+        default: return "https://www.chabad.org/dailystudy/default_cdo/jewish/Daily-Study.htm";
+      }
+    }
+
+    function render() {
+      const today = new Date();
+      const monday = getMonday(today);
+      const weekKey = isoDate(monday);
+
+      weekLabelEl.textContent = "Week of: " + fmtDate(monday);
+
+      const state = loadState();
+      if (!state[weekKey]) {
+        state[weekKey] = { mon:false, tue:false, wed:false, thu:false, fri:false };
+        saveState(state);
+      }
+
+      const track = trackEl.value;
+      openSourceEl.href = trackSourceUrl(track);
+
+      const days = [
+        { key: "mon", label: "Monday" },
+        { key: "tue", label: "Tuesday" },
+        { key: "wed", label: "Wednesday" },
+        { key: "thu", label: "Thursday" },
+        { key: "fri", label: "Friday" }
+      ];
+
+      weekListEl.innerHTML = "";
+      days.forEach((d, i) => {
+        const row = document.createElement("div");
+        row.className = "dayrow";
+        row.innerHTML = `
+          <div>
+            <b>${d.label}</b>
+            <div class="muted">${trackEl.options[trackEl.selectedIndex].text}</div>
+          </div>
+          <input class="chk" type="checkbox" ${state[weekKey][d.key] ? "checked" : ""} aria-label="${d.label} done">
+        `;
+
+        const chk = row.querySelector("input");
+        chk.addEventListener("change", () => {
+          const s = loadState();
+          s[weekKey] = s[weekKey] || {};
+          s[weekKey][d.key] = chk.checked;
+          saveState(s);
+        });
+
+        weekListEl.appendChild(row);
+      });
+    }
+
+    // Init
+    const savedTrack = localStorage.getItem(KEY_TRACK);
+    if (savedTrack) trackEl.value = savedTrack;
+
+    trackEl.addEventListener("change", () => {
+      localStorage.setItem(KEY_TRACK, trackEl.value);
+      render();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      const monday = getMonday(new Date());
+      const weekKey = isoDate(monday);
+      const s = loadState();
+      s[weekKey] = { mon:false, tue:false, wed:false, thu:false, fri:false };
+      saveState(s);
+      render();
+    });
+
+    printBtn.addEventListener("click", () => window.print());
+
+    render();
+
+    // SW register
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js");
+    }
+  </script>
+</body>
+</html>
